@@ -5,15 +5,15 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 class Residue:
-	def __getitem__(self, i):
-		pass
-	def type(self):
-		pass
-	def num(self):
-		pass
-	def chain(self):
-		pass
-	def atoms(self):
-		pass
-	def atom(self, name):
-		pass
+    def __getitem__(self, i):
+        pass
+    def type(self):
+        pass
+    def num(self):
+        pass
+    def chain(self):
+        pass
+    def atoms(self):
+        pass
+    def atom(self, name):
+        pass
