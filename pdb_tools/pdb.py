@@ -23,36 +23,58 @@ aas = set(three21.keys())
 one23 = {v: k for k, v in three21.items()}
 
 class PDB:
+    """
+    Class representing a Protein Data Bank file. The underlying structure is
+    a pandas dataset, however, it can be accesseed using
+    pdb[<chain>][<residue-num>][<atom-name>], i.e.
+    pdb['A'][1]["CA"] will yield the CA-atom of the first residue of chain 'A'.
+    """
+
     def __init__(self, pdb_file=sys.stdin):
+        """
+        Constructor, takes file-handler as input, otherwise the standard input.
+        """
         cspecs = [(0, 6), (6, 11), (12, 16), (16, 17), (17, 20), (21, 22),
                   (22, 26), (26, 27), (30, 38), (38, 46), (46, 54), (54, 60),
                   (60, 66), (76, 78), (78, 80)]
+        names  = ["tag", "serial", "name", "altLoc", "resName", "chainID",
+                  "resSeq", "iCode", "x", "y", "z", "occupancy", "tempFactor",
+                  "element", "charge"]
+        dtype  = {"tag": "str", "serial": "int64", "name": "str",
+                  "altLoc": "str", "resName": "str", "chainID": "str",
+                  "resSeq": "int64", "iCode": "str", 
+                  "x": "float64", "y": "float64", "z": "float64",
+                  "occupancy": "float64", "tempFactor": "float64",
+                  "element": "str", "charge": "str"}
+        df     = pd.read_fwf(pdb_file, colspecs=cspecs, header=None, names=names,
+                             keep_default_na=False)
+        self._data   = df[df.tag == "ATOM"].astype(dtype).reset_index(drop=True)
+        self._chains = self._data.chainID.unique()
+        del df
 
-        df = pd.read_fwf(pdb_file, colspecs=cspecs, header=None,
-                        names=["tag", "serial", "name", "altLoc", "resName",
-                                "chainID", "resSeq", "iCode", "x", "y", "z",
-                                "occupancy", "tempFactor", "element", "charge"])
+    def __getitem__(self, ch):
+        """Returns chain with either chainID `ch` or with index `ch`."""
+        if isinstance(ch, int):
+            chainID = self._chains[ch]
+            return Chain(self._data, chainID)
 
-        self._data = df[df.tag.isin(["ATOM", "TER", "END"])].reset_index(drop=True).copy()
-
-    def __getitem__(self, i):
-        return Chain(self._data, i)
+        return Chain(self._data, ch)
 
     def residues(self):
-        for i in range(len(self._data.res_r)):
-            yield Residue(self._data, i)
+        pass
 
     def chains(self):
-        for i in range(len(self._data.chain_r)):
-            yield Chain(self._data, i)
+        """Returns an iterator with all chains"""
+        for ch in self._chains:
+            yield Chain(self._data, ch)
 
     def atoms(self):
-        for i in range(self._data.length):
+        """Return all atoms"""
+        for i in self._data.index:
             yield Atom(self._data, i)
 
     def write(self, f=sys.stdout):
+        """Write pdb to file-handler, otherwise standard output."""
         for c in self.chains():
-            for a in c.atoms():
-                a.write(f)
-            print("TER", file=f)
+            c.write(f)
         print("END", file=f)
