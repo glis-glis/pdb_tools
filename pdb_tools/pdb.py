@@ -5,11 +5,9 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import sys
-import pandas as pd
+import re
 
 from .chain import Chain
-from .residue import Residue
-from .atom import Atom
 
 BB   = ["N", "CA", "C", "O"]
 
@@ -34,47 +32,50 @@ class PDB:
         """
         Constructor, takes file-handler as input, otherwise the standard input.
         """
-        cspecs = [(0, 6), (6, 11), (12, 16), (16, 17), (17, 20), (21, 22),
-                  (22, 26), (26, 27), (30, 38), (38, 46), (46, 54), (54, 60),
-                  (60, 66), (76, 78), (78, 80)]
-        names  = ["tag", "serial", "name", "altLoc", "resName", "chainID",
-                  "resSeq", "iCode", "x", "y", "z", "occupancy", "tempFactor",
-                  "element", "charge"]
-        dtype  = {"tag": "str", "serial": "int64", "name": "str",
-                  "altLoc": "str", "resName": "str", "chainID": "str",
-                  "resSeq": "int64", "iCode": "str", 
-                  "x": "float64", "y": "float64", "z": "float64",
-                  "occupancy": "float64", "tempFactor": "float64",
-                  "element": "str", "charge": "str"}
-        df     = pd.read_fwf(pdb_file, colspecs=cspecs, header=None, names=names,
-                             keep_default_na=False)
-        self._data   = df[df.tag == "ATOM"].astype(dtype).reset_index(drop=True)
-        self._chains = self._data.chainID.unique()
-        del df
+        self._names  = {"serial": 0, "name": 1, "altLoc": 2, "resName": 3,
+                        "chainID": 4, "resSeq": 5, "iCode": 6,
+                        "x": 7, "y": 8, "z": 9,
+                        "occupancy": 10, "tempFactor": 11,
+                        "element": 12, "charge": 13}
+
+        r = re.compile("^ATOM  (.{5}) "
+                       "(.{4})(.{1})(.{3}) "
+                       "(.{1})(.{4})(.{1})   "
+                       "(.{8})(.{8})(.{8})(.{6})(.{6})          "
+                       "(.{2})(.{2})$", re.M)
+
+        self._lines = r.findall(pdb_file.read())
+        ch_names    = sorted({l[4] for l in self._lines})
+        starts      = []
+
+        for ch in ch_names:
+            starts.append(next(i for i, l in enumerate(self._lines) if l[4] == ch))
+
+        ends = starts[1:]
+        ends.append(len(self._lines))
+
+        self._chains   = []
+        self._chainIDs = {}
+        for i, ch in enumerate(ch_names):
+            self._chains.append(slice(starts[i], ends[i]))
+            self._chainIDs[ch] = i
+
 
     def __getitem__(self, ch):
         """Returns chain with either chainID `ch` or with index `ch`."""
-        if isinstance(ch, int):
-            chainID = self._chains[ch]
-            return Chain(self._data, chainID)
-
-        return Chain(self._data, ch)
-
-    def residues(self):
         pass
 
     def chains(self):
         """Returns an iterator with all chains"""
         for ch in self._chains:
-            yield Chain(self._data, ch)
+            yield Chain(self._lines, ch)
 
     def atoms(self):
         """Return all atoms"""
-        for i in self._data.index:
-            yield Atom(self._data, i)
+        pass
 
     def write(self, f=sys.stdout):
         """Write pdb to file-handler, otherwise standard output."""
-        for c in self.chains():
-            c.write(f)
-        print("END", file=f)
+        for ch in self.chains():
+            ch.write(f)
+        f.write("END\n")

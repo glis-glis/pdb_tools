@@ -6,48 +6,45 @@
 
 import sys
 
-names  = ["tag", "serial", "name", "altLoc", "resName", "chainID",
-            "resSeq", "iCode", "x", "y", "z", "occupancy", "tempFactor",
-            "element", "charge"]
+# key to index
+key2i = {"serial": 0, "name": 1, "altLoc": 2, "resName": 3,
+          "chainID": 4, "resSeq": 5, "iCode": 6,
+          "x": 7, "y": 8, "z": 9,
+          "occupancy": 10, "tempFactor": 11,
+          "element": 12, "charge": 13}
 
-k2i = {n: i for i, n in enumerate(names)}
+# Filed names keys
+keys   = key2i.keys()
 
 class Atom(object):
-    def __init__(self, data, index):
-        object.__setattr__(self, "_data", data)
-        object.__setattr__(self, "_i", index)
-        object.__setattr__(self, "_keys", data.keys())
+    """
+    Class representing one atom.
+    Internaly, it has a pointer to the list of all atoms and an index in the list.
+    """
+    def __init__(self, lines, index):
+        object.__setattr__(self, "_lines", lines)
+        object.__setattr__(self, "_index", index)
 
     def __getattr__(self, key):
-        #if key in object.__getattribute__(self, "_keys"):
-        return self._data.at[self._i, key]
+        if key in keys:
+            ls = object.__getattribute__(self, "_lines")
+            i  = object.__getattribute__(self, "_index")
+            return ls[i][key2i[key]]
 
-        #return object.__getattribute__(self, key)
+        return object.__getattribute__(self, key)
 
     def __setattr__(self, key, value):
-        #if key in object.__getattribute__(self, "_keys"):
-        self._data.at[self._i, key] = value
-        #else:
-        #    object.__setattr__(self, key, value)
+        if key in keys:
+            ls = object.__getattribute__(self, "_lines")
+            i  = object.__getattribute__(self, "_index")
+            ls[i][key2i[key]] = value
+        else:
+            object.__setattr__(self, key, value)
 
     def write(self, f=sys.stdout):
-        #f.write(self.serial, self.name, self.altLoc, self.resName, self.chainID,
-        #      self.resSeq, self.iCode, self.x, self.y, self.z,
-        #      self.occupancy, self.tempFactor, self.element, self.charge)
-
-        sf = "ATOM  %5i %-4s%1s%3s %1s%4i%1s   %8s%8s%8s%6.2f%6.2f          %2s%2s\n"
-        #sout = sf%(self.serial, self.name, self.altLoc, self.resName, self.chainID,
-        #           self.resSeq, self.iCode,
-        #           "%8.3f"%self.x, "%8.3f"%self.y, "%8.3f"%self.z,
-        #           self.occupancy, self.tempFactor, self.element, self.charge)
-        data = self._data
-        i    = self._i
-
-        sout = sf%(data.iat[i, 1], data.iat[i, 2], data.iat[i, 3], data.iat[i, 4],
-                   data.iat[i, 5], data.iat[i, 6], data.iat[i, 7],
-                   "%8.3f"%data.iat[i, 8], "%8.3f"%data.iat[i, 9],
-                   "%8.3f"%data.iat[i, 10], data.iat[i, 11], data.iat[i, 12],
-                   data.iat[i, 13], data.iat[i, 14])
-
-        f.write(sout)
-        #print(sout, file=f)
+        l = self._lines[self._index]
+        f.write(f"ATOM  {l[0]} "
+                f"{l[1]}{l[2]}{l[3]} "
+                f"{l[4]}{l[5]}{l[6]}   "
+                f"{l[7]}{l[8]}{l[9]}{l[10]}{l[11]}          "
+                f"{l[12]}{l[13]}\n")

@@ -9,17 +9,16 @@
 import argparse
 import os
 import sys
-import pandas as pd
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-#from pdb_tools import PDB
-#from pdb_tools.pdb import PDB
+from pdb_tools import PDB
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description='Copy pdb file')
-	parser.add_argument("pdb", type=argparse.FileType('r'), nargs='?',
-	                    default=sys.stdin, help="pdb-file")
+    parser = argparse.ArgumentParser(description="Parse pdb file and write to"
+                                     "stdout. Used for performance testing")
+    parser.add_argument("pdb", type=argparse.FileType('r'), nargs='?',
+                        default=sys.stdin, help="pdb-file")
 
-	args  = parser.parse_args()
-	#pdb   = PDB(args.pdb)
-	#pdb.write()
+    args  = parser.parse_args()
+    pdb   = PDB(args.pdb)
+    pdb.write()
