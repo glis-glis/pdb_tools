@@ -1,0 +1,16 @@
+* pdb_tools
+Protein Data Bank format parsing and manipulation tools
+
+* Usage
+** Clone a Copy
+#+BEGIN_SRC
+$ git clone https://github.com/afue/pdb_tools.org
+#+END_SRC
+
+* Design Choices
+** Regular Expressions
+- Use the simplest backend as possible:
+  Pandas takes 0.3s to import, while regex imports under 0.01s. 
+  Also, parsing with regex takes ~0.03s, while it takes 0.1s in pandas.
+  0.3s seems to be acceptable, but 0.3s x 10k pdbs takes 50 minutes just
+  to import pandas!

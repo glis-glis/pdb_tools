@@ -38,8 +38,8 @@ class Chain:
     def chainID(self):
         return next(self._lines[self._indexes])[4]
 
-    @resName.setter
-    def resName(self, value):
+    @chainID.setter
+    def chainID(self, value):
         self._lines[self._indexes][4] = value
 
     def residues(self):
