@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+
+# Copyright (C) 2019 Andreas Füglistaler <andreas.fueglistaler@epfl.ch>
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import argparse
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from pdb_tools import PDB
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Renumber a pdb, starting with"
+                                     "<start>, optionally keeping gaps")
+    parser.add_argument("pdb", type=argparse.FileType('r'), nargs='?',
+                        default=sys.stdin, help="pdb-file")
+    parser.add_argument("--start", "-s", type=int, default=1)
+    #parser.add_argument("--keep_gaps", "-k", action='store_true', default=False,
+    #                    help="Keep gaps")
+
+    args  = parser.parse_args()
+    pdb   = PDB(args.pdb)
+
+    nres = args.start
+    for ch in pdb:
+        for r in ch:
+            r.resSeq = nres
+            nres    += 1
+    pdb.write()
