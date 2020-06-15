@@ -44,7 +44,7 @@ class PDB:
                        "(.{8})(.{8})(.{8})(.{6})(.{6})          "
                        "(.{2})(.{2})$", re.M)
 
-        self._lines = r.findall(pdb_file.read())
+        self._lines = [list(t) for t in r.findall(pdb_file.read())]
         ch_names    = sorted({l[4] for l in self._lines})
         starts      = []
 

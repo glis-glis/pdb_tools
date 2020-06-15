@@ -20,19 +20,22 @@ class Residue:
 
     @property
     def resName(self):
-        return next(self._lines[self._indexes])[3]
+        return self._lines[self._indexes][0][3]
 
     @resName.setter
     def resName(self, value):
-        self._lines[self._indexes][3] = value
+        for l in self._lines[self._indexes]:
+            l[3] = value
 
     @property
     def resSeq(self):
-        return next(self._lines[self._indexes])[5]
+        return self._lines[self._indexes][0][5]
 
     @resSeq.setter
     def resSeq(self, value):
-        self._lines[self._indexes][5] = value
+        rs = ("%4d"%value)[0:4]
+        for l in self._lines[self._indexes]:
+            l[5] = rs
 
     def atoms(self):
         """

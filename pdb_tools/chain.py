@@ -36,11 +36,13 @@ class Chain:
 
     @property
     def chainID(self):
-        return next(self._lines[self._indexes])[4]
+        return self._lines[self._indexes][0][4]
 
     @chainID.setter
     def chainID(self, value):
-        self._lines[self._indexes][4] = value
+        ci = value[0]
+        for l in self._lines[self._indexes]:
+            l[4] = ci
 
     def residues(self):
         """

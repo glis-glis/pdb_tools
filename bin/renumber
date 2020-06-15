@@ -9,6 +9,7 @@
 import argparse
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from pdb_tools import PDB
@@ -22,12 +23,12 @@ if __name__ == "__main__":
     #parser.add_argument("--keep_gaps", "-k", action='store_true', default=False,
     #                    help="Keep gaps")
 
-    args  = parser.parse_args()
-    pdb   = PDB(args.pdb)
+    args = parser.parse_args()
+    pdb  = PDB(args.pdb)
 
     nres = args.start
-    for ch in pdb:
-        for r in ch:
+    for ch in pdb.chains():
+        for r in ch.residues():
             r.resSeq = nres
             nres    += 1
     pdb.write()
