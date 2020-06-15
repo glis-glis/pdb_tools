@@ -22,7 +22,8 @@ class Chain:
         starts   = []
 
         for r in res_seq:
-            starts.append(next(i for i, l in enumerate(lines[indexes])
+            starts.append(next(i for i, l in enumerate(lines[indexes],
+                                                       start=indexes.start)
                                if l[5] == r))
 
         ends = starts[1:]
@@ -34,6 +35,8 @@ class Chain:
             self._residues.append(slice(starts[i], ends[i]))
             self._resSeq[r] = i
 
+        self._iter_i = 0
+
     @property
     def chainID(self):
         return self._lines[self._indexes][0][4]
@@ -44,12 +47,16 @@ class Chain:
         for l in self._lines[self._indexes]:
             l[4] = ci
 
-    def residues(self):
-        """
-        return a residues iterator
-        """
-        for r in self._residues:
-            yield Residue(self._lines, r)
+    def __iter__(self):
+        self._iter_i = 0
+        return self
+
+    def __next__(self):
+        if self._iter_i < len(self._residues):
+            self._iter_i += 1
+            return Residue(self._lines, self._residues[self._iter_i - 1])
+
+        raise StopIteration
 
     def atoms(self):
         """
@@ -62,7 +69,7 @@ class Chain:
         """
         return residue `i`
         """
-        pass
+        return Residue(self._lines, i)
 
     def write(self, f=sys.stdout):
         for l in self._lines[self._indexes]:

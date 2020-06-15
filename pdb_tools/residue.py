@@ -14,6 +14,7 @@ class Residue:
     def __init__(self, lines, indexes):
         self._lines   = lines
         self._indexes = indexes
+        self._iter_i = 0
 
     def __getitem__(self, i):
         return Atom(self._lines, i)
@@ -37,9 +38,13 @@ class Residue:
         for l in self._lines[self._indexes]:
             l[5] = rs
 
-    def atoms(self):
-        """
-        return a atom iterator
-        """
-        for i in self._indexes:
-            yield Atom(self._lines, i)
+    def __iter__(self):
+        self._iter_i = 0
+        return self
+
+    def __next__(self):
+        if self._iter_i < len(self._indexes):
+            self._iter_i += 1
+            return Atom(self._lines, self._indexes[self._iter_i - 1])
+
+        raise StopIteration

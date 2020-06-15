@@ -24,16 +24,17 @@ def pdb_test():
 
 def chain_test():
     zev = PDB(open("input/3zev.pdb", "r"))
-    for ch in zev.chains():
-        assert ch.chainID in "ABCD"
-        ch.chainID = chr(ord(ch.chainID) + 4)
-        assert ch.chainID in "EFGH"
+    for ch, c1, c2 in zip(zev, "ABCD", "EFGH"):
+        assert ch.chainID == c1
+        ch.chainID = c2
+        assert ch.chainID == c2
 
 def residue_test():
     zev = PDB(open("input/3zev.pdb", "r"))
-    for r in next(zev.chains()).residues():
-        #print(r.resName, r.resSeq)
-        r.resSeq = 0
-        print(r.resName, r.resSeq)
-    
+    for i, r in enumerate(next(zev)):
+        r.resSeq = i
+        assert int(r.resSeq) == i
+
+pdb_test()
+chain_test()
 residue_test()

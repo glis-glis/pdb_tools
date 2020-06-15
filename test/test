@@ -6,12 +6,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-pytest -q
+pytest -q > /dev/null #only erros count
 
 
 for f in input/*.pdb;do
 	name=${f/input\//}
 	name=${name/.pdb/}
-	../bin/copy $f | diff - output/${name}_copy.pdb
-	../bin/renumber $f | diff - output/${name}_renumber.pdb
+	../bin/copy $f | diff - output/${name}_copy.pdb 
+	../bin/renumber $f | diff - output/${name}_renumber.pdb 
 done

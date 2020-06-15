@@ -27,8 +27,15 @@ if __name__ == "__main__":
     pdb  = PDB(args.pdb)
 
     nres = args.start
-    for ch in pdb.chains():
-        for r in ch.residues():
+    for ch in pdb:
+        #print(ch._residues[0])
+        for r in ch:
             r.resSeq = nres
             nres    += 1
+        #break
+    #print(pdb._lines)
+    #for ch in pdb:
+    #    print(ch.chainID)
+    #    for r in ch:
+    #        print("".join([r.resName, r.resSeq]))
     pdb.write()

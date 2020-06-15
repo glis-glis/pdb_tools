@@ -32,12 +32,6 @@ class PDB:
         """
         Constructor, takes file-handler as input, otherwise the standard input.
         """
-        self._names  = {"serial": 0, "name": 1, "altLoc": 2, "resName": 3,
-                        "chainID": 4, "resSeq": 5, "iCode": 6,
-                        "x": 7, "y": 8, "z": 9,
-                        "occupancy": 10, "tempFactor": 11,
-                        "element": 12, "charge": 13}
-
         r = re.compile("^ATOM  (.{5}) "
                        "(.{4})(.{1})(.{3}) "
                        "(.{1})(.{4})(.{1})   "
@@ -60,22 +54,28 @@ class PDB:
             self._chains.append(slice(starts[i], ends[i]))
             self._chainIDs[ch] = i
 
+        self._iter_i = 0
 
     def __getitem__(self, ch):
         """Returns chain with either chainID `ch` or with index `ch`."""
-        pass
+        if isinstance(ch, str):
+            return Chain(self._lines, ch)
 
-    def chains(self):
-        """Returns an iterator with all chains"""
-        for ch in self._chains:
-            yield Chain(self._lines, ch)
+        return Chain(self._lines, self._chainIDs[ch])
 
-    def atoms(self):
-        """Return all atoms"""
-        pass
+    def __iter__(self):
+        self._iter_i = 0
+        return self
+
+    def __next__(self):
+        if self._iter_i < len(self._chains):
+            self._iter_i += 1
+            return Chain(self._lines, self._chains[self._iter_i - 1])
+
+        raise StopIteration
 
     def write(self, f=sys.stdout):
         """Write pdb to file-handler, otherwise standard output."""
-        for ch in self.chains():
+        for ch in self:#.chains():
             ch.write(f)
         f.write("END\n")
