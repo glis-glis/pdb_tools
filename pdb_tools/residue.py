@@ -14,6 +14,7 @@ class Residue:
     def __init__(self, lines, indexes):
         self._lines   = lines
         self._indexes = indexes
+        self._length  = indexes.stop - indexes.start
         self._iter_i = 0
 
     def __getitem__(self, i):
@@ -25,16 +26,17 @@ class Residue:
 
     @resName.setter
     def resName(self, value):
+        rn = value[:3] # Making sure the formatting remains correct
         for l in self._lines[self._indexes]:
-            l[3] = value
+            l[3] = rn
 
     @property
     def resSeq(self):
-        return self._lines[self._indexes][0][5]
+        return int(self._lines[self._indexes][0][5])
 
     @resSeq.setter
     def resSeq(self, value):
-        rs = ("%4d"%value)[0:4]
+        rs = ("%4d"%value)[:4] # Making sure the formatting remains correct
         for l in self._lines[self._indexes]:
             l[5] = rs
 
@@ -43,8 +45,8 @@ class Residue:
         return self
 
     def __next__(self):
-        if self._iter_i < len(self._indexes):
+        if self._iter_i < self._length:
             self._iter_i += 1
-            return Atom(self._lines, self._indexes[self._iter_i - 1])
+            return Atom(self._lines, self._indexes.start + self._iter_i - 1)
 
         raise StopIteration

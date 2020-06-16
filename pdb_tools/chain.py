@@ -43,7 +43,7 @@ class Chain:
 
     @chainID.setter
     def chainID(self, value):
-        ci = value[0]
+        ci = value[0] # Making sure the formatting remains correct
         for l in self._lines[self._indexes]:
             l[4] = ci
 
