@@ -4,7 +4,7 @@ Protein Data Bank format parsing and manipulation tools
 * Usage
 ** Clone a Copy
 #+BEGIN_SRC
-$ git clone https://github.com/afue/pdb_tools.org
+$ git clone https://github.com/afue/pdb_tools.git
 #+END_SRC
 
 * Design Choices
