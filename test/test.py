@@ -23,7 +23,7 @@ def pdb_test():
     assert len(mnb._chains) == 1
     assert len(zev._chains) == 4
     for c in "ABCD":
-        assert c in zev._chainIDs
+        assert c in zev._id2i
 
 def chain_test():
     zev = PDB(open("input/3zev.pdb", "r"))
@@ -124,10 +124,6 @@ def atom_test():
                 # for all atoms in a residue
                 a.resSeq = i
                 assert a.resSeq == i
-
-
-
-
 
 pdb_test()
 chain_test()

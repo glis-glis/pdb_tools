@@ -16,7 +16,7 @@ from pdb_tools import PDB
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Renumber a pdb, starting with"
-                                     "<start>, optionally keeping gaps")
+                                     "<--start>, optionally keeping gaps")
     parser.add_argument("pdb", type=argparse.FileType('r'), nargs='?',
                         default=sys.stdin, help="pdb-file")
     parser.add_argument("--start", "-s", type=int, default=1)

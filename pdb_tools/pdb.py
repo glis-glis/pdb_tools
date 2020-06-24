@@ -7,6 +7,7 @@
 import sys
 import re
 
+from .atom import Atom
 from .chain import Chain
 
 BB   = ["N", "CA", "C", "O"]
@@ -48,20 +49,20 @@ class PDB:
         ends = starts[1:]
         ends.append(len(self._lines))
 
-        self._chains   = []
-        self._chainIDs = {}
+        self._chains = []
+        self._id2i   = {} # chainID to chainIndex
         for i, ch in enumerate(ch_names):
             self._chains.append(slice(starts[i], ends[i]))
-            self._chainIDs[ch] = i
+            self._id2i[ch] = i
 
         self._iter_i = 0
 
     def __getitem__(self, ch):
         """Returns chain with either chainID `ch` or with index `ch`."""
         if isinstance(ch, str):
-            return Chain(self._lines, ch)
+            return Chain(self._lines, self._chains[self._id2i[ch.upper()]])
 
-        return Chain(self._lines, self._chainIDs[ch])
+        return Chain(self._lines, self._chains[ch])
 
     def __iter__(self):
         self._iter_i = 0
@@ -73,6 +74,13 @@ class PDB:
             return Chain(self._lines, self._chains[self._iter_i - 1])
 
         raise StopIteration
+
+    def atoms(self):
+        """
+        return a atom iterator
+        """
+        for i in range(len(self._lines)):
+            yield Atom(self._lines, i)
 
     def write(self, f=sys.stdout):
         """Write pdb to file-handler, otherwise standard output."""

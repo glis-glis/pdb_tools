@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+# Copyright (C) 2019 Andreas Füglistaler <andreas.fueglistaler@epfl.ch>
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import argparse
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from pdb_tools import PDB
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Translate whole pdb or"
+                                     "one chain defined by <--chain> in"
+				     "<-x>, <-y> and/or <-z> direction.")
+    parser.add_argument("pdb", type=argparse.FileType('r'), nargs='?',
+                        default=sys.stdin, help="pdb-file")
+    parser.add_argument("--chain", "-c", default="")
+    parser.add_argument("-x", type=float)
+    parser.add_argument("-y", type=float)
+    parser.add_argument("-z", type=float)
+
+    args = parser.parse_args()
+    pdb  = PDB(args.pdb)
+
+    if args.chain:
+        if args.chain.isnumeric():
+            c = int(args.chain)
+        else:
+            c = args.chain
+        ch = pdb[c]
+    else:
+        ch = pdb
+
+    # Most probable use-case is to use only x, y or z
+    if args.x:
+        for a in ch.atoms():
+            a.x += args.x
+    if args.y:
+        for a in ch.atoms():
+            a.y += args.y
+    if args.z:
+        for a in ch.atoms():
+            a.z += args.z
+
+    pdb.write()

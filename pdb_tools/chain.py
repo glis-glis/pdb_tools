@@ -62,7 +62,7 @@ class Chain:
         """
         return a atom iterator
         """
-        for i in self._indexes:
+        for i in range(self._indexes.start, self._indexes.stop):
             yield Atom(self._lines, i)
 
     def __getitem__(self, i):
