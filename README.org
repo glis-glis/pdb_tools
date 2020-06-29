@@ -1,16 +1,32 @@
 * pdb_tools
-Protein Data Bank format parsing and manipulation tools
+  Protein Data Bank format parsing and manipulation tools
 
 * Usage
 ** Clone a Copy
-#+BEGIN_SRC
+   #+BEGIN_SRC
 $ git clone https://github.com/afue/pdb_tools.git
-#+END_SRC
+   #+END_SRC
 
 * Design Choices
 ** Regular Expressions
-- Use the simplest backend as possible:
-  Pandas takes 0.3s to import, while regex imports under 0.01s. 
-  Also, parsing with regex takes ~0.03s, while it takes 0.1s in pandas.
-  0.3s seems to be acceptable, but 0.3s x 10k pdbs takes 50 minutes just
-  to import pandas!
+   Use the simplest backend as possible: Pandas takes 0.3s to import,
+   while regex imports under 0.01s.  Also, parsing with regex takes
+   ~0.03s, while it takes 0.1s in pandas.  0.3s seems to be acceptable,
+   but 0.3s x 10k pdbs takes 50 minutes just to import pandas!
+** Lazy data
+   Most data in a pdb-file will not be used in a typical operation, so
+   parse most things lazily. Initially, only the chain-IDs and
+   residue-numbers are parsed everything else is parsed on demand.
+** Data is Flat Table
+   Data is internally stored as a table. All objects (Atoms, Residues,
+   Chains, PDB) are views on this table.
+** Objects behave as Iterators and Lists/Dicts
+   - All Objects except Atom (PDB, Chain, Residue) are iterators, the
+     iterator yields the next lower hierarchy, a PDB yields chains, a
+     chain residues, a residue atoms the next lower hierarchy, a PDB
+     yields chains, a chain residues, a residue atoms.
+   - You can access members with the [] operator
+   - You get access to the atoms directly through the .atoms() method.
+** Use of Property to Read/Write Data
+   - You can change for the residue-number using Residue.resSeq = N
+     which will internally change resSeq of all atoms in this residue 

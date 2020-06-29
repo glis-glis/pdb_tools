@@ -6,20 +6,25 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-#pytest -q > /dev/null #only erros count
+set -e
 
-#python3 test.py
+ediff() {
+   diff -q - $1 $2 1>&2 
+}
+
+python3 test.py
 
 for f in input/*.pdb;do
 	name=${f#input/}
 	name=${name%.pdb}
 
-	../bin/copy $f | diff - output/${name}_copy.pdb 
+	../bin/copy $f | ediff output/${name}_copy.pdb 
+	cat $f | ediff output/${name}_renumber.pdb 
 
-	../bin/renumber $f | diff - output/${name}_renumber.pdb 
+	../bin/renumber $f | ediff output/${name}_renumber.pdb 
 
-	../bin/translate $f -z 50 | diff - output/${name}_translate.pdb 
-	../bin/translate $f -c 0 -z 50 | diff - output/${name}_translate_0.pdb 
-	../bin/translate $f -c 'A' -z 50 | diff - output/${name}_translate_0.pdb 
-	../bin/translate $f -c 'a' -z 50 | diff - output/${name}_translate_0.pdb 
+	../bin/translate $f -z 50 | ediff output/${name}_translate.pdb 
+	../bin/translate $f -c 0 -z 50 | ediff output/${name}_translate_0.pdb 
+	../bin/translate $f -c 'A' -z 50 | ediff output/${name}_translate_0.pdb 
+	../bin/translate $f -c 'a' -z 50 | ediff output/${name}_translate_0.pdb 
 done
