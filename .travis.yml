@@ -1,6 +1,6 @@
 language: python
 
-script: - (cd test; ./test)
+script: - test/test
 
 notifications:
     email: false
