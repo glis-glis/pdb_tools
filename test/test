@@ -20,7 +20,6 @@ for f in input/*.pdb;do
 	name=${name%.pdb}
 
 	../bin/copy $f | ediff output/${name}_copy.pdb 
-	cat $f | ediff output/${name}_renumber.pdb 
 
 	../bin/renumber $f | ediff output/${name}_renumber.pdb 
 

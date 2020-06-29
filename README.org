@@ -1,5 +1,6 @@
 * pdb_tools
-  Protein Data Bank format parsing and manipulation tools
+[[https://travis-ci.org/afue/pdb_tools][https://travis-ci.org/afue/pdb_tools.svg?branch=master]]
+Protein Data Bank format parsing and manipulation tools
 
 * Usage
 ** Clone a Copy
