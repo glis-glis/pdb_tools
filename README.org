@@ -10,7 +10,7 @@ $ git clone https://github.com/afue/pdb_tools.git
    #+END_SRC
 ** Scripts
    All scripts are in the bin folder. Each script has a help, which
-   can be evoked by ‘~bin/script --help~’
+   can be evoked by ~bin/script --help~
 
 * Design Choices
 ** Regular Expressions
