@@ -1,5 +1,6 @@
 * pdb_tools
 [[https://travis-ci.org/afue/pdb_tools][https://travis-ci.org/afue/pdb_tools.svg?branch=master]]
+
 Protein Data Bank format parsing and manipulation tools
 
 * Usage
@@ -7,6 +8,9 @@ Protein Data Bank format parsing and manipulation tools
    #+BEGIN_SRC
 $ git clone https://github.com/afue/pdb_tools.git
    #+END_SRC
+** Scripts
+   All scripts are in the bin folder. Each script has a help, which
+   can be evoked by ‘~bin/script --help~’
 
 * Design Choices
 ** Regular Expressions

@@ -6,7 +6,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-set -e
+#set -e
 cd `dirname $0`
 
 ediff() {
@@ -24,7 +24,16 @@ for f in input/*.pdb;do
 	../bin/renumber $f | ediff output/${name}_renumber.pdb 
 
 	../bin/translate $f -z 50 | ediff output/${name}_translate.pdb 
-	../bin/translate $f -c 0 -z 50 | ediff output/${name}_translate_0.pdb 
-	../bin/translate $f -c 'A' -z 50 | ediff output/${name}_translate_0.pdb 
-	../bin/translate $f -c 'a' -z 50 | ediff output/${name}_translate_0.pdb 
+	../bin/translate $f -c 0 -z 50 | ediff output/${name}_translate_A.pdb 
+	../bin/translate $f -c 'A' -z 50 | ediff output/${name}_translate_A.pdb 
+	../bin/translate $f -c 'a' -z 50 | ediff output/${name}_translate_A.pdb 
+
+	../bin/extract $f -c 'A' | ediff output/${name}_extract_A.pdb
 done
+
+f=input/3zev.pdb
+
+../bin/translate $f -c 'C' -z 5000 | ediff output/${name}_translate_C.pdb 
+../bin/extract $f -c 'A,C' | ediff output/${name}_extract_AC.pdb
+../bin/extract $f -c 'C,A' | ediff output/${name}_extract_CA.pdb
+../bin/extract $f -c 'C,A' -r | ediff output/${name}_extract_CA_r.pdb

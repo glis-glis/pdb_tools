@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+
+# Copyright (C) 2019 Andreas Füglistaler <andreas.fueglistaler@epfl.ch>
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+import argparse
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from pdb_tools import PDB
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Extract chain(s) from file")
+    parser.add_argument("pdb", type=argparse.FileType('r'), nargs='?',
+                        default=sys.stdin, help="pdb-file")
+    parser.add_argument("--chains", "-c", required=True, help="Chains,"
+                        "coma-seperated, without spaces, i.e. A,B."
+                        "Can be used to rearange, i.e. B,A")
+    parser.add_argument("--rechain", "-r", action='store_true', default=False,
+                        help="Renumber chains A through Z, useful to rearange.")
+
+    args = parser.parse_args()
+    pdb  = PDB(args.pdb)
+    chid = 'A'
+
+    for ch in args.chains.split(","):
+        if args.rechain:
+            # Using the "feature" that pdb only parses the chains once
+            # meaning that even if there are now two chains called
+            # 'A', it will only remember the initial chain IDs
+            pdb[ch].chainID = chid
+            chid = chr(ord(chid) + 1)
+
+        pdb[ch].write()
+    print("END")
