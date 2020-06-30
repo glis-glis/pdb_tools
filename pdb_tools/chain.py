@@ -37,16 +37,6 @@ class Chain:
 
         self._iter_i = 0
 
-    @property
-    def chainID(self):
-        return self._lines[self._indexes][0][4]
-
-    @chainID.setter
-    def chainID(self, value):
-        ci = value[0] # Making sure the formatting remains correct
-        for l in self._lines[self._indexes]:
-            l[4] = ci
-
     def __iter__(self):
         self._iter_i = 0
         return self
@@ -58,18 +48,33 @@ class Chain:
 
         raise StopIteration
 
+    def __len__(self):
+        return len(self._residues)
+
+
+    def __getitem__(self, i):
+        """
+        return residue `i`
+        """
+        return Residue(self._lines, self._residues[i])
+
+    @property
+    def chainID(self):
+        return self._lines[self._indexes][0][4]
+
+    @chainID.setter
+    def chainID(self, value):
+        ci = value[0] # Making sure the formatting remains correct
+        for l in self._lines[self._indexes]:
+            l[4] = ci
+
+
     def atoms(self):
         """
         return a atom iterator
         """
         for i in range(self._indexes.start, self._indexes.stop):
             yield Atom(self._lines, i)
-
-    def __getitem__(self, i):
-        """
-        return residue `i`
-        """
-        return Residue(self._lines, i)
 
     def write(self, f=sys.stdout):
         for l in self._lines[self._indexes]:

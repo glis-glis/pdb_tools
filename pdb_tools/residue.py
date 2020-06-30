@@ -50,3 +50,6 @@ class Residue:
             return Atom(self._lines, self._indexes.start + self._iter_i - 1)
 
         raise StopIteration
+
+    def __len__(self):
+        return self._length

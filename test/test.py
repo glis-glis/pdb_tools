@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (C) 2019 Andreas Füglistaler <andreas.fueglistaler@epfl.ch>
+# Copyright (C) 2020 Andreas Füglistaler <andreas.fueglistaler@epfl.ch>
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,18 +15,22 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from pdb_tools import PDB
+from pdb_tools import FASTA
+from pdb_tools import aas, one23
 
 def pdb_test():
     mnb = PDB(open("input/1mnb.pdb", "r"))
     zev = PDB(open("input/3zev.pdb", "r"))
 
-    assert len(mnb._chains) == 1
-    assert len(zev._chains) == 4
+    assert len(mnb) == len(mnb._chains) == 1
+    assert len(zev) == len(zev._chains) == 4
     for c in "ABCD":
         assert c in zev._id2i
 
 def chain_test():
     zev = PDB(open("input/3zev.pdb", "r"))
+    assert len(zev) == 4
+    assert len(zev[0]) == 307
     for ch, c1, c2 in zip(zev, "ABCD", "EFGH"):
         assert ch.chainID == c1
         ch.chainID = c2
@@ -34,6 +38,7 @@ def chain_test():
 
 def residue_test():
     zev = PDB(open("input/3zev.pdb", "r"))
+    assert len(zev[0][0]) == 7
     for ch in zev:
         for i, r in enumerate(ch):
             r.resSeq = i
@@ -125,7 +130,18 @@ def atom_test():
                 a.resSeq = i
                 assert a.resSeq == i
 
-pdb_test()
-chain_test()
-residue_test()
-atom_test()
+
+
+
+def fasta_test():
+    fasta = FASTA(open("input/1mnb.fasta", "r"))
+    assert len(fasta) == 1
+    for s in fasta[0]:
+        assert one23[s] in aas
+
+if __name__ == "__main__":
+    pdb_test()
+    chain_test()
+    residue_test()
+    atom_test()
+    fasta_test()

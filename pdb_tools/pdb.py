@@ -10,23 +10,13 @@ import re
 from .atom import Atom
 from .chain import Chain
 
-BB   = ["N", "CA", "C", "O"]
-
-three21 = {'CYS': 'C', 'ASP': 'D', 'SER': 'S', 'GLN': 'Q', 'LYS': 'K',
-            'ILE': 'I', 'PRO': 'P', 'THR': 'T', 'PHE': 'F', 'ASN': 'N',
-            'GLY': 'G', 'HIS': 'H', 'LEU': 'L', 'ARG': 'R', 'TRP': 'W',
-            'ALA': 'A', 'VAL':'V', 'GLU': 'E', 'TYR': 'Y', 'MET': 'M'}
-
-aas = set(three21.keys())
-
-one23 = {v: k for k, v in three21.items()}
-
 class PDB:
     """
-    Class representing a Protein Data Bank file. The underlying structure is
-    a pandas dataset, however, it can be accesseed using
-    pdb[<chain>][<residue-num>][<atom-name>], i.e.
-    pdb['A'][1]["CA"] will yield the CA-atom of the first residue of chain 'A'.
+    Class representing a Protein Data Bank file, i.e. a protein
+    structure. The underlying structure is a pandas dataset, however,
+    it can be accesseed using
+    pdb[<chain>][<residue-num>][<atom-name>], i.e.  pdb['A'][1]["CA"]
+    will yield the CA-atom of the first residue of chain 'A'.
     """
 
     def __init__(self, pdb_file=sys.stdin):
@@ -75,12 +65,23 @@ class PDB:
 
         raise StopIteration
 
+    def __len__(self):
+        return len(self._chains)
+
     def atoms(self):
         """
         return a atom iterator
         """
         for i in range(len(self._lines)):
             yield Atom(self._lines, i)
+
+    def residues(self):
+        """
+        return a residue iterator
+        """
+        for ch in self:
+            for res in ch:
+                yield res
 
     def write(self, f=sys.stdout):
         """Write pdb to file-handler, otherwise standard output."""
