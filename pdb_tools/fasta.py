@@ -6,22 +6,36 @@
 
 import sys
 
+
+
 class FASTA:
     """
     Class representing a FASTA file, i.e. a protein sequence.
     """
 
-    def __init__(self, fasta_file=sys.stdin):
+    def _parse_seq(self, fasta_seq):
         """
-        Constructor, takes file-handler as input, otherwise the standard input.
+        Parse `fasta_seq`, which needs to be an iterator yielding strings.
+        Throws if the number of comments is not the same as number of sequences
         """
-        self._sqs = []
-        for l in fasta_file:
+        for l in fasta_seq:
             if l.startswith(">"):
                 self._sqs.append("")
+                self._comments.append(l.strip())
                 continue
 
             self._sqs[-1] = "".join([self._sqs[-1], l.strip()])
+        assert len(self._sqs) == len(self._comments)
+
+    def __init__(self, fasta_seq=sys.stdin):
+        """
+        Constructor, takes file-handler as input, otherwise the standard input.
+        Fasta seq can be either a file or a list of strings.
+        """
+        self._sqs      = []
+        self._comments = []
+        if fasta_seq:
+            self._parse_seq(fasta_seq)
 
         self._iter_i = 0
 
@@ -50,3 +64,14 @@ class FASTA:
         l = min([len(sq) for sq in self._sqs])
         for i in range(l):
             yield tuple(sq[i] for sq in self._sqs)
+
+    def write(self, f=sys.stdout):
+        """Write fasta sequence"""
+        for c, s in zip(self._comments, self._sqs):
+            lo = [c]
+            while len(s) > 70:
+                lo.append(s[:70])
+                s = s[70:]
+            lo.append(s)
+            f.write("\n".join(lo))
+            f.write("\n")

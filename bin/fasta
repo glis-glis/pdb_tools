@@ -12,13 +12,13 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from pdb_tools import PDB
+from pdb_tools import FASTA
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Parse pdb file and write to"
-                                     "stdout. Used for performance testing")
+    parser = argparse.ArgumentParser(description="Print fasta sequence")
     parser.add_argument("pdb", type=argparse.FileType('r'), nargs='?',
                         default=sys.stdin, help="pdb-file")
 
     args  = parser.parse_args()
 
-    PDB(args.pdb).write()
+    PDB(args.pdb).fasta().write()

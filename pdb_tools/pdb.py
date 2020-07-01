@@ -9,6 +9,8 @@ import re
 
 from .atom import Atom
 from .chain import Chain
+from .fasta import FASTA
+from .amino import three21
 
 class PDB:
     """
@@ -88,3 +90,14 @@ class PDB:
         for ch in self:#.chains():
             ch.write(f)
         f.write("END\n")
+
+    def fasta(self):
+        """Return fasta file with sequence(s)"""
+        ls = []
+        for ch in self:
+            ls.append(f"> {ch.chainID}")
+            rs = []
+            for res in ch:
+                rs.append(three21[res.resName])
+            ls.append("".join(rs))
+        return FASTA(ls)

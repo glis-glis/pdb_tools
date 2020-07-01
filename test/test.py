@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from pdb_tools import PDB
 from pdb_tools import FASTA
-from pdb_tools import aas, one23
+from pdb_tools.amino import acids
 
 def pdb_test():
     mnb = PDB(open("input/1mnb.pdb", "r"))
@@ -41,6 +41,7 @@ def residue_test():
     assert len(zev[0][0]) == 7
     for ch in zev:
         for i, r in enumerate(ch):
+            assert r.resName in acids[3]
             r.resSeq = i
             r.resName = "AAAAA"
             assert int(r.resSeq) == i
@@ -137,7 +138,7 @@ def fasta_test():
     fasta = FASTA(open("input/1mnb.fasta", "r"))
     assert len(fasta) == 1
     for s in fasta[0]:
-        assert one23[s] in aas
+        assert s in acids[1]
 
 if __name__ == "__main__":
     pdb_test()
