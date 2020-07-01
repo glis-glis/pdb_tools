@@ -34,12 +34,15 @@ if __name__ == "__main__":
     for al in fasta.alignement():
         aa_tar = al[0] # Target amino acid
         aa_tem = al[1] # Template amino acid
-        if aa_tar == aa_tem == '-':
+        if aa_tar == '-' == aa_tem:
             continue
         if aa_tar == '-': # Skip that residue
             res = next(ress)
             continue
         if aa_tem == '-': # Create residue on the fly
             pass
+        if aa_tar == aa_tem: #Same residue, just copy
+
+            res.write()
 
 

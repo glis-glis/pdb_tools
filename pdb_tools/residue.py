@@ -4,6 +4,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+import sys
+
 from .atom import Atom
 
 class Residue:
@@ -19,6 +21,20 @@ class Residue:
 
     def __getitem__(self, i):
         return Atom(self._lines, i)
+
+    def __iter__(self):
+        self._iter_i = 0
+        return self
+
+    def __next__(self):
+        if self._iter_i < self._length:
+            self._iter_i += 1
+            return Atom(self._lines, self._indexes.start + self._iter_i - 1)
+
+        raise StopIteration
+
+    def __len__(self):
+        return self._length
 
     @property
     def resName(self):
@@ -40,16 +56,11 @@ class Residue:
         for l in self._lines[self._indexes]:
             l[5] = rs
 
-    def __iter__(self):
-        self._iter_i = 0
-        return self
-
-    def __next__(self):
-        if self._iter_i < self._length:
-            self._iter_i += 1
-            return Atom(self._lines, self._indexes.start + self._iter_i - 1)
-
-        raise StopIteration
-
-    def __len__(self):
-        return self._length
+    def write(self, f=sys.stdout):
+        for l in self._lines[self._indexes]:
+            f.write(f"ATOM  {l[0]} "
+                f"{l[1]}{l[2]}{l[3]} "
+                f"{l[4]}{l[5]}{l[6]}   "
+                f"{l[7]}{l[8]}{l[9]}{l[10]}{l[11]}          "
+                f"{l[12]}{l[13]}\n")
+        f.write("TER\n")
