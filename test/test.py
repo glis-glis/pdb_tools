@@ -135,7 +135,7 @@ def atom_test():
 
 
 def fasta_test():
-    fasta = FASTA(open("input/1mnb.fasta", "r"))
+    fasta = FASTA(open("output/1mnb.fasta", "r"))
     assert len(fasta) == 1
     for s in fasta[0]:
         assert s in acids[1]
