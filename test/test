@@ -30,6 +30,9 @@ for f in input/*.pdb;do
 
 	../bin/extract $f -c 'A' | ediff output/${name}_extract_A.pdb
 	../bin/fasta $f  | ediff output/${name}.fasta
+	../bin/thread  $f -f input/${name}_${name}.fasta \
+	    | ediff output/${name}_${name}.pdb
+
 done
 
 f=input/3zev.pdb

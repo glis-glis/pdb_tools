@@ -13,15 +13,26 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from pdb_tools import PDB
 from pdb_tools import FASTA
+from pdb_tools import amino
 
-BB   = ["N", "CA", "C", "O"]
+def write_res(serial, resName, chainID, resSeq, f=sys.stdout):
+    """Write BB-atoms for residue `resName` and chain `chainID`"""
+    for name in [" N  ", " CA ", " C  ", " O  "]:
+        f.write(f"ATOM  {serial:5} "
+                f"{name} {resName[:3]} "
+                f"{chainID[0]}{resSeq:4}"
+                "       0.000   0.000   0.000 -1.00  0.00           "
+                f"{name[1]}\n")
+        serial += 1
+    return serial, resSeq + 1
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Thread target"
                                      "sequence on template structure.")
     parser.add_argument("pdb", type=argparse.FileType('r'), nargs='?',
                         default=sys.stdin, help="pdb-file")
-    parser.add_argument("--fasta", "-f", required=True,
+    parser.add_argument("--fasta", "-f", required=True, type=argparse.FileType('r'),
                         help="Alignement fasta-file")
 
     args  = parser.parse_args()
@@ -31,18 +42,46 @@ if __name__ == "__main__":
     ress = pdb.residues()
     res = next(ress)
 
+    ser = 1
+    ch  = 'A'
+    seq = 1
+
+    BB   = ["N", "CA", "C", "O"]
+
     for al in fasta.alignement():
         aa_tar = al[0] # Target amino acid
         aa_tem = al[1] # Template amino acid
-        if aa_tar == '-' == aa_tem:
+
+        if aa_tar == '-' == aa_tem: #Skip
             continue
         if aa_tar == '-': # Skip that residue
-            res = next(ress)
+            res = next(ress, None)
             continue
         if aa_tem == '-': # Create residue on the fly
-            pass
+            ser, seq = write_res(ser, amino.one23[aa_tar], ch, seq)
+            continue
         if aa_tar == aa_tem: #Same residue, just copy
+            for a in res:
+                a.serial  = ser
+                a.chainID = ch
+                a.resSeq  = seq
+                a.write()
+                ser += 1
+                
+            seq += 1
+            res = next(ress, None)
+            continue
 
-            res.write()
-
-
+        for a in res:
+            if ((a.name in BB)
+                or (not aa_tar == 'G' and a.name in "CB")):
+                a.serial  = ser
+                a.chainID = ch
+                a.resName = amino.one23[aa_tar]
+                a.resSeq  = seq
+                a.write()
+                ser += 1
+        seq += 1
+        res = next(ress, None)
+    print("TER")
+    print("END")
