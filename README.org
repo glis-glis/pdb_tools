@@ -1,5 +1,5 @@
 * pdb_tools
-[[https://travis-ci.org/afue/pdb_tools][https://travis-ci.org/afue/pdb_tools.svg?branch=master]]
+[[https://travis-ci.com/github/glis-glis/pdb_tools][https://api.travis-ci.com/glis-glis/pdb_tools.svg?branch=master]]
 
 Protein Data Bank format parsing and manipulation tools
 
